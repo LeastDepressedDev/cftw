@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/wopertac/itmo/lab/cftw/cli/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
