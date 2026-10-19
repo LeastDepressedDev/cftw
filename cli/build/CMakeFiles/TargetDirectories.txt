@@ -1,3 +1,0 @@
-/home/wopertac/itmo/lab/cftw/cli/build/CMakeFiles/cftw-cli.dir
-/home/wopertac/itmo/lab/cftw/cli/build/CMakeFiles/edit_cache.dir
-/home/wopertac/itmo/lab/cftw/cli/build/CMakeFiles/rebuild_cache.dir

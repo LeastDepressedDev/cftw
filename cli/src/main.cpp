@@ -22,17 +22,22 @@ struct Config {
 	string watermarkPath;
 };
 
+// errors
+const int kUnknownFlagError         = -1;
+const int kWrongUsageError          = -2;
+const int kWrongArgumentError       = -3;
+
 // long flags
-const char* const kHelpLong = "--help";
-const char* const kInputLong = "--input";
-const char* const kOutputLong = "--output";
-const char* const kWatermarkLong = "--watermark";
+const char* const kHelpLong         = "--help";
+const char* const kInputLong        = "--input";
+const char* const kOutputLong       = "--output";
+const char* const kWatermarkLong    = "--watermark";
 
 // short flags
-const char kHelpShort = 'h';
-const char kInputShort = 'i';
-const char kOutputShort = 'o';
-const char kWatermarkShort = 'w';
+const char kHelpShort               = 'h';
+const char kInputShort              = 'i';
+const char kOutputShort             = 'o';
+const char kWatermarkShort          = 'w';
 
 /*
 
@@ -76,7 +81,7 @@ void printHelp(){
 
 int nextArg(int argc, char** argv, int* i, string* configPtr){
     if (*i + 1 >= argc){
-        return -2;
+        return kWrongUsageError;
     }else{
         if (argv[*i + 1][0] != '-'){
             *configPtr = string(argv[*i + 1]);
@@ -84,7 +89,7 @@ int nextArg(int argc, char** argv, int* i, string* configPtr){
             return 0;
         }
         else {
-            return -2;
+            return kWrongUsageError;
         }
     }
 }
@@ -123,27 +128,27 @@ int ParseArguments(int argc, char** argv, Config* config){
                 // --input
                 else if(strcmp(argv[i], kInputLong) == 0){
                     if (nextArg(argc, argv, &i, &config->inputPath) != 0){
-                        return -2;
+                        return kWrongUsageError;
                     }
                 }
     
                 // --output
                 else if(strcmp(argv[i], kOutputLong) == 0){
                     if (nextArg(argc, argv, &i, &config->outputPath) != 0){
-                        return -2;
+                        return kWrongUsageError;
                     }                    
                 }
 
                 // --watermark
                 else if(strcmp(argv[i], kWatermarkLong) == 0){
                     if (nextArg(argc, argv, &i, &config->watermarkPath) != 0){
-                        return -2;
+                        return kWrongUsageError;
                     }                    
                 }
 
                 // Unknown flag exeption
                 else {
-                    return -1; 
+                    return kUnknownFlagError; 
                 }
             }
 
@@ -160,14 +165,14 @@ int ParseArguments(int argc, char** argv, Config* config){
                     // -i
                     case(kInputShort):
                         if (nextArg(argc, argv, &i, &config->inputPath) != 0){
-                            return -2;
+                            return kWrongUsageError;
                         }
                         break;
 
                     // -o
                     case(kOutputShort):
                         if (nextArg(argc, argv, &i, &config->outputPath) != 0){
-                            return -2;
+                            return kWrongUsageError;
                         }
 
                         break;
@@ -175,14 +180,14 @@ int ParseArguments(int argc, char** argv, Config* config){
                     // -w
                     case(kWatermarkShort):
                         if (nextArg(argc, argv, &i, &config->watermarkPath) != 0){
-                            return -2;
+                            return kWrongUsageError;
                         }
 
                         break;
         
                     // Unknown flag exeption
                     default:
-                        return -1;
+                        return kUnknownFlagError;
                         break;
                 }
             }
@@ -192,13 +197,13 @@ int ParseArguments(int argc, char** argv, Config* config){
     // Validity check
     
     if (config->inputPath == ""){
-        return -3;
+        return kWrongArgumentError;
     }
     if (config->outputPath == ""){
-        return -3;
+        return kWrongArgumentError;
     }
     if (config->watermarkPath == ""){
-        return -3;
+        return kWrongArgumentError;
     }
 
     return 0;
@@ -232,20 +237,20 @@ int main(int argc, char** argv){
     	    cout << config.watermarkPath << "\n";
             break;
 
-        case(-1):       // Unknown flag
+        case(kUnknownFlagError):       // Unknown flag
             cerr << "Error: unknown flag\n"
                 "Try 'cftw-cli --help' for more information\n";
             break;
 
-        case(-2):       // Wrong usage
+        case(kWrongUsageError):       // Wrong usage
             cerr << "Error: wrong usage\n"
                 "Try 'cftw-cli --help' from more information\n";
             break;
 
-        case(-3):       // Wrong argument
+        case(kWrongArgumentError):       // Wrong argument
             cerr << "Error: wrong argument"
                 "Try 'cftw-cli --help' from more information\n";
-            break
+            break;
     }
 
 	return 0;	
