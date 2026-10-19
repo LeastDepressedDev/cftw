@@ -192,13 +192,13 @@ int ParseArguments(int argc, char** argv, Config* config){
     // Validity check
     
     if (config->inputPath == ""){
-        return -2;
+        return -3;
     }
     if (config->outputPath == ""){
-        return -2;
+        return -3;
     }
     if (config->watermarkPath == ""){
-        return -2;
+        return -3;
     }
 
     return 0;
@@ -241,6 +241,11 @@ int main(int argc, char** argv){
             cerr << "Error: wrong usage\n"
                 "Try 'cftw-cli --help' from more information\n";
             break;
+
+        case(-3):       // Wrong argument
+            cerr << "Error: wrong argument"
+                "Try 'cftw-cli --help' from more information\n";
+            break
     }
 
 	return 0;	
