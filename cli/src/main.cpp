@@ -22,26 +22,6 @@ struct Config {
 
 /*
 
-    Struct for errors
-
-    char* error_message     - error message
-    int error_code          - error code
-
-*/
-
-struct Error {
-    char* error_message;
-    int error_code;
-
-    Error(char* error_message_arg, int error_code_arg) {
-        error_message = error_message_arg;
-        error_code = error_code_arg;
-    }
-
-};
-
-/*
-
    Config constructor
 
    Return:
@@ -61,10 +41,46 @@ Config* ConfigConstructor(){
     return res;
 }
 
+/*
+
+    Struct for errors
+
+    char* error_message     - error message
+    int error_code          - error code
+
+*/
+
+struct Error {
+    char* error_message;
+    int error_code;
+};
+
+/*
+
+   Config constructor
+
+   Arguments:
+    error_message_arg       - error message
+    error_code_arg          - error code
+
+   Return:
+    Error with error message and error code
+
+*/
+
+Error* ErrorConstructor(char* error_message_arg, int error_code_arg){
+    Error* res = new Error();
+
+    res->error_message = error_message_arg;
+    res->error_code = error_code_arg;
+
+    return res;
+}
+
 // errors
-const Error* kUnknownFlagError          = new Error((char*)"unknown flag", -1);
-const Error* kWrongUsageError           = new Error((char*)"wrong usage", -2);
-const Error* kWrongArgumentError        = new Error((char*)"wrong argument", -3);
+const Error* kUnknownFlagError          = ErrorConstructor((char*)"unknown flag", -1);
+const Error* kWrongUsageError           = ErrorConstructor((char*)"wrong usage", -2);
+const Error* kWrongArgumentError        = ErrorConstructor((char*)"wrong argument", -3);
 
 // long flags
 const std::string kHelpLong             = "--help";
