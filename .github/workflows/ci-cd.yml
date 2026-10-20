@@ -66,7 +66,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Using pre-built directory
-        uses: actions/download-artifact@4
+        uses: actions/download-artifact@v4
         with:
           name: __runtime
           path: __runtime
