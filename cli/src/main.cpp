@@ -106,7 +106,7 @@ const char kWatermarkShort              = 'w';
 
 void Raise(const Error* error){
     std::cerr << "ERROR: " << error->error_message << "\n";
-    std::cerr << " Try 'cftw-cli --help' for more information\n";
+    std::cerr << " Try 'cftw-cli --help' for more information\n"; // TODO: Make a Error type dependent
 
     exit(error->error_code);
 }
@@ -129,7 +129,7 @@ void PrintHelp(){
     
     std::cout << " " << std::left << std::setw(25) << "-i, --input <path>" << "Path to the source BMP image\n";
     std::cout << " " << std::left << std::setw(25) << "-w, --watermark <path>" << "Path to the BMP watermark\n";
-    std::cout << " " << std::left << std::setw(25) << "-i, --output <path>" << "Path to the output BMP image\n";
+    std::cout << " " << std::left << std::setw(25) << "-o, --output <path>" << "Path to the output BMP image\n";
 
     std::cout << "\nOptional flags:\n";
 
