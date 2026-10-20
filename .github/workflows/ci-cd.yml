@@ -1,4 +1,4 @@
-name: CI
+name: Build and test
 
 on:
   push:
@@ -19,8 +19,8 @@ jobs:
 
       - name: Installing defaults
         run: |
-          apt update
-          apt install python3 -y tree cmake clang
+          sudo apt update
+          sudo apt install python3 -y tree cmake clang
 
       
       - name: Compiling bmplib
