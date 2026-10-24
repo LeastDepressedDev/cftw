@@ -153,31 +153,38 @@ void ParseArguments(int argc, char** argv, Config* config){
             // Sort Flags
 
             else{
-                switch(argv[i][1]){
-                    // -h
-                    case(kHelpShort):
-                        PrintHelp();
+                int j = 1;
+
+                while (argv[i][j] != '\0'){
+                    switch(argv[i][j]){
+                        // -h
+                        case(kHelpShort):
+                            PrintHelp();
+                            break;
+    
+                        // -i
+                        case(kInputShort):
+                            config->input_path = NextArg(argc, argv, i);
                         break;
 
-                    // -i
-                    case(kInputShort):
-                        config->input_path = NextArg(argc, argv, i);
-                        break;
-
-                    // -o
-                    case(kOutputShort):
-                        config->output_path = NextArg(argc, argv, i);
-                        break;
-
-                    // -w
-                    case(kWatermarkShort):
-                        config->watermark_path = NextArg(argc, argv, i);
-                        break;
+                        // -o
+                        case(kOutputShort):
+                            config->output_path = NextArg(argc, argv, i);
+                            break;
+    
+                        // -w
+                        case(kWatermarkShort):
+                            config->watermark_path = NextArg(argc, argv, i);
+                            break;
         
-                    // Unknown flag exeption
-                    default:
-                        Raise(kUnknownFlagError);
-                        break;
+                        // Unknown flag exeption
+                        default:
+                            Raise(kUnknownFlagError);
+                            break;
+                    }
+
+                    j ++;
+
                 }
             }
         }
