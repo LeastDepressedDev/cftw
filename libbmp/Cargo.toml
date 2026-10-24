@@ -1,0 +1,16 @@
+[package]
+name = "libbmp"
+version = "0.0.0"
+edition = "2024"
+
+[lib]
+name = "bmp"
+path = "src/lib.rs"
+crate-type = ["staticlib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
