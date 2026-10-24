@@ -1,12 +1,3 @@
-/**
-* This is a template. Do not use this one in any imports. It is meant to be copied to another directory and properly implemented and changed.
-*
-* Note for Matvey: if you are commiting partial implementation, mark temporary not implemented functions as [[deprecated]].
-* Also, if function can throw/raise error, add # Throws section to it's documentation.
-*
-* Note for Roman: Carefully read docuementation before implementing main functional.
-*/
-
 #pragma once
 
 #ifdef __cplusplus
