@@ -32,7 +32,7 @@ jobs:
           if [[ ! -d cli/include ]]; then
             mkdir cli/include
           fi
-          cp fordev/bmplib.h cli/include
+          cp libbmp/headers/bmplib.h cli/include
         
 
       - name: Compiling core_cli
