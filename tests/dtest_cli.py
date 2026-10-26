@@ -40,9 +40,9 @@ Test("RandomGibberishFlag2").cmd_line(["-a-b-a"]).expect_error(255, ERROR_UNKNOW
 Test("EmptyShortFlag").cmd_line(["-", "something"]).expect_error(252, ERROR_EMPTY_FLAG).wrap_up(ArgSection)
 Test("EmptyLongFlag").cmd_line(["--", "something"]).expect_error(252, ERROR_EMPTY_FLAG).wrap_up(ArgSection)
 
-Test("MultisettingSingle").cmd_line(["-oiw", "path"]).expect("path\npath\npath").wrap_up(ArgSection)
+Test("MultisettingSingle").cmd_line(["-oiw", "path"]).expect("path\npath\npath\n").wrap_up(ArgSection)
 Test("MultisettingSeparate").cmd_line(["-oi", "path", '-w', "wm_path"]).expect("path\npath\nwm_path\n").wrap_up(ArgSection)
-Test("MultisettingSeparateMixed").cmd_line(["-iw", "path", '--watermark', "wm_path"]).expect("path\npath\nwm_path\n").wrap_up(ArgSection)
+Test("MultisettingSeparateMixed").cmd_line(["-io", "path", '--watermark', "wm_path"]).expect("path\npath\nwm_path\n").wrap_up(ArgSection)
 
 Test("TemporaryCompleteCallShort").cmd_line(["-i", "source", "-w", "wm_source", "-o", "output_path"])\
     .expect("source\noutput_path\nwm_source\n").wrap_up(ArgSection)
