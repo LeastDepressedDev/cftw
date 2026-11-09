@@ -4,8 +4,8 @@ if [[ ! -d build ]]; then
     mkdir build
 fi
 
-./.github/workflows/b_lib.sh &&
-./.github/workflows/m_lib_to_cli.sh &&
-./.github/workflows/b_cli.sh &&
+./.github/building/b_lib.sh &&
+./.github/building/m_lib_to_cli.sh &&
+./.github/building/b_cli.sh &&
 
 cp cli/build/cftw-cli ./build

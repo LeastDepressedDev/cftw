@@ -24,15 +24,15 @@ jobs:
 
       
       - name: Compiling bmplib
-        run: ./.github/b_lib.sh
+        run: ./.github/building/b_lib.sh
 
 
       - name: Moving artifacts
-        run: ./.github/m_lib_to_cli.sh
+        run: ./.github/building/m_lib_to_cli.sh
         
 
       - name: Compiling core_cli
-        run: ./.github/b_cli.sh
+        run: ./.github/building/b_cli.sh
 
 
       - name: Building tests/runtime directory
