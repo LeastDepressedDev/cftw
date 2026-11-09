@@ -9,4 +9,5 @@ add_executable(cftw-cli
     src/globals.cpp
 )
 
-target_include_directories(cftw-cli PRIVATE include)
+target_include_directories(cftw-cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(cftw-cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libbmp.a)

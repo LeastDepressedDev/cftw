@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
-#include <bmplib.h>
+#include "../include/bmplib.h"
 #include <stdlib.h>
 #include "globals.h"
 
