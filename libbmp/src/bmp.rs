@@ -528,6 +528,7 @@ pub struct BmpHeader {
 	pixel_offset: u32,
 }
 
+#[allow(unused)]
 impl BmpHeader {
 	fn new(
 		header_size: u32,
@@ -590,6 +591,7 @@ pub struct Image {
 	pub data: Vec<Pixel>,
 }
 
+#[allow(unused)]
 impl Image {
 	pub fn new(
 		width: u32,

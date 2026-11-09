@@ -1,3 +1,5 @@
-/libbmp/target/
+target
 decktest*
 .vscode
+build
+*.a

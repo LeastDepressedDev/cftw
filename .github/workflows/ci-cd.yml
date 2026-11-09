@@ -20,25 +20,20 @@ jobs:
       - name: Installing defaults
         run: |
           sudo apt update
-          sudo apt install python3 -y tree cmake clang
+          sudo apt install python3 -y tree cmake clang rustc
 
       
       - name: Compiling bmplib
-        run: echo Rust compilation task here
+        run: ./.github/b_lib.sh
 
 
       - name: Moving artifacts
-        run: |
-          if [[ ! -d cli/include ]]; then
-            mkdir cli/include
-          fi
-          cp libbmp/headers/bmplib.h cli/include
+        run: ./.github/m_lib_to_cli.sh
         
 
       - name: Compiling core_cli
-        run: |
-          cd cli &&
-          cmake -B build && cmake --build build
+        run: ./.github/b_cli.sh
+
 
       - name: Building tests/runtime directory
         run: |
