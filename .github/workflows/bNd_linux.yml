@@ -72,3 +72,10 @@ jobs:
       - name: Runing tests
         run: cd __runtime && python3 dtest_*
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: cli-tests
+
+    steps:
+      - name: Deploy
+        run: echo Deploy section
