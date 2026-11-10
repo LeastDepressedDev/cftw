@@ -1,8 +1,7 @@
 mod bmp;
 mod byteorder;
-
 use std::{
-	ffi::{CStr, CString, OsStr, c_char},
+	ffi::{CStr, CString, OsStr, c_char, c_ulong},
 	os::unix::ffi::OsStrExt,
 };
 
@@ -19,10 +18,10 @@ pub struct Margin {
 #[repr(C)]
 pub struct BmpImage {
 	ptr: *mut Pixel,
-	size: u32,     // number of Pixels (== Vec::len)
-	capacity: u32, // == Vec::capacity
-	width: u32,
-	height: u32,
+	size: c_ulong,     // number of Pixels (== Vec::len)
+	capacity: c_ulong, // == Vec::capacity
+	width: c_ulong,
+	height: c_ulong,
 	header: [u8; 12],
 	dib_header: [u8; 40],
 }
@@ -61,10 +60,10 @@ fn image_into_bmp(img: crate::bmp::Image) -> BmpImage {
 	unsafe {
 		BmpImage {
 			ptr,
-			size: size as u32,
-			capacity: capacity as u32,
-			width,
-			height,
+			size: size as c_ulong,
+			capacity: capacity as c_ulong,
+			width: width as c_ulong,
+			height: height as c_ulong,
 			header: std::mem::transmute(header),
 			dib_header: std::mem::transmute(dib_header),
 		}
@@ -80,9 +79,9 @@ unsafe fn as_image(img: *const BmpImage) -> std::mem::ManuallyDrop<crate::bmp::I
 		header: unsafe { std::mem::transmute(b.header) },
 		dib_header: unsafe { std::mem::transmute(b.dib_header) },
 		color_palette: None,
-		width: b.width,
-		height: b.height,
-		padding: b.width % 4, // TODO: proper BMP row padding formula
+		width: b.width as u32,
+		height: b.height as u32,
+		padding: (b.width % 4) as u32, // TODO: proper BMP row padding formula
 		data: unsafe { Vec::from_raw_parts(b.ptr, b.size as usize, b.capacity as usize) },
 	})
 }
@@ -102,8 +101,8 @@ unsafe fn pixels_mut<'a>(img: *mut BmpImage) -> &'a mut [Pixel] {
 /// deallocate safely later with `Vec::from_raw_parts(ptr, size, size)`.
 fn ok_bmp(
 	data: Vec<Pixel>,
-	width: u32,
-	height: u32,
+	width: c_ulong,
+	height: c_ulong,
 	header: [u8; 12],
 	dib_header: [u8; 40],
 ) -> ResultBmpImage {
@@ -114,10 +113,10 @@ fn ok_bmp(
 		ptr: std::ptr::null(),
 		img: Box::into_raw(Box::new(BmpImage {
 			ptr,
-			size: size as u32,
-			capacity: capacity as u32,
-			width,
-			height,
+			size: size as c_ulong,
+			capacity: capacity as c_ulong,
+			width: width as c_ulong,
+			height: height as c_ulong,
 			header,
 			dib_header,
 		})),
@@ -198,25 +197,25 @@ pub extern "C" fn write_bmp(
 #[unsafe(no_mangle)]
 pub extern "C" fn index(
 	img: *mut BmpImage,
-	x: u32,
-	y: u32,
-) -> u32 {
+	x: c_ulong,
+	y: c_ulong,
+) -> c_ulong {
 	if img.is_null() {
-		return u32::MAX;
+		return c_ulong::MAX;
 	}
 	let b = unsafe { &*img };
 	if x < b.width && y < b.height {
 		x + y * b.width
 	} else {
-		u32::MAX
+		c_ulong::MAX
 	}
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn read_pixel(
 	img: *mut BmpImage,
-	x: u32,
-	y: u32,
+	x: c_ulong,
+	y: c_ulong,
 ) -> ResultPixel {
 	let fail = || ResultPixel {
 		data: Pixel::new(0, 0, 0),
@@ -226,7 +225,7 @@ pub extern "C" fn read_pixel(
 		return fail();
 	}
 	let idx = index(img, x, y);
-	if idx == u32::MAX {
+	if idx == c_ulong::MAX {
 		return fail();
 	}
 	let slice = unsafe { pixels(img) };
@@ -242,15 +241,15 @@ pub extern "C" fn read_pixel(
 #[unsafe(no_mangle)]
 pub extern "C" fn set_pixel(
 	img: *mut BmpImage,
-	x: u32,
-	y: u32,
+	x: c_ulong,
+	y: c_ulong,
 	color: Pixel,
 ) -> bool {
 	if img.is_null() {
 		return false;
 	}
 	let idx = index(img, x, y);
-	if idx == u32::MAX {
+	if idx == c_ulong::MAX {
 		return false;
 	}
 	let slice = unsafe { pixels_mut(img) };
@@ -355,12 +354,9 @@ pub extern "C" fn margin(
 	if new_w_i <= 0 || new_h_i <= 0 {
 		return err_bmp("margin: empty resulting image", 2);
 	}
-	if new_w_i > u32::MAX as i64 || new_h_i > u32::MAX as i64 {
-		return err_bmp("margin: resulting image too large", 2);
-	}
 
-	let new_w = new_w_i as u32;
-	let new_h = new_h_i as u32;
+	let new_w = new_w_i as c_ulong;
+	let new_h = new_h_i as c_ulong;
 	let Some(total) = (new_w as usize).checked_mul(new_h as usize) else {
 		return err_bmp("margin: resulting image too large", 2);
 	};
@@ -391,8 +387,8 @@ pub extern "C" fn margin(
 #[unsafe(no_mangle)]
 pub extern "C" fn shrink(
 	img: *const BmpImage,
-	new_width: u32,
-	new_height: u32,
+	new_width: c_ulong,
+	new_height: c_ulong,
 ) -> ResultBmpImage {
 	if img.is_null() {
 		return err_bmp("shrink: null argument", 2);
@@ -412,9 +408,9 @@ pub extern "C" fn shrink(
 
 	let mut out = Vec::with_capacity(total);
 	for ny in 0..new_height {
-		let sy0 = ((ny as u64 * b.height as u64) / new_height as u64) as u32;
-		let mut sy1 =
-			(((ny as u64 + 1) * b.height as u64 + new_height as u64 - 1) / new_height as u64) as u32;
+		let sy0 = ((ny as c_ulong * b.height as c_ulong) / new_height as c_ulong) as c_ulong;
+		let mut sy1 = (((ny as c_ulong + 1) * b.height as c_ulong + new_height as c_ulong - 1)
+			/ new_height as c_ulong) as c_ulong;
 		if sy1 <= sy0 {
 			sy1 = sy0 + 1;
 		}
@@ -423,9 +419,9 @@ pub extern "C" fn shrink(
 		}
 
 		for nx in 0..new_width {
-			let sx0 = ((nx as u64 * b.width as u64) / new_width as u64) as u32;
-			let mut sx1 =
-				(((nx as u64 + 1) * b.width as u64 + new_width as u64 - 1) / new_width as u64) as u32;
+			let sx0 = ((nx as c_ulong * b.width as c_ulong) / new_width as c_ulong) as c_ulong;
+			let mut sx1 = (((nx as c_ulong + 1) * b.width as c_ulong + new_width as c_ulong - 1)
+				/ new_width as c_ulong) as c_ulong;
 			if sx1 <= sx0 {
 				sx1 = sx0 + 1;
 			}
@@ -433,18 +429,18 @@ pub extern "C" fn shrink(
 				sx1 = b.width;
 			}
 
-			let mut r_sum: u64 = 0;
-			let mut g_sum: u64 = 0;
-			let mut b_sum: u64 = 0;
-			let mut count: u64 = 0;
+			let mut r_sum: c_ulong = 0;
+			let mut g_sum: c_ulong = 0;
+			let mut b_sum: c_ulong = 0;
+			let mut count: c_ulong = 0;
 
 			for sy in sy0..sy1 {
 				let row = (sy as usize) * (b.width as usize);
 				for sx in sx0..sx1 {
 					let p = src[row + sx as usize];
-					r_sum += p.r as u64;
-					g_sum += p.g as u64;
-					b_sum += p.b as u64;
+					r_sum += p.r as c_ulong;
+					g_sum += p.g as c_ulong;
+					b_sum += p.b as c_ulong;
 					count += 1;
 				}
 			}
