@@ -1,5 +1,4 @@
 mod bmp;
-mod byteorder;
 use std::{
 	ffi::{CStr, CString, OsStr, c_char, c_ulong},
 	os::unix::ffi::OsStrExt,
@@ -145,7 +144,7 @@ fn err_str(msg: &str) -> *const c_char {
 // =====================================================================
 
 #[unsafe(no_mangle)]
-pub extern "C" fn open_bmp(s: *const c_char) -> ResultBmpImage {
+pub unsafe extern "C" fn open_bmp(s: *const c_char) -> ResultBmpImage {
 	use crate::bmp::BmpErrorKind::*;
 	if s.is_null() {
 		return err_bmp("open_bmp: null path", 3);
@@ -172,7 +171,7 @@ pub extern "C" fn open_bmp(s: *const c_char) -> ResultBmpImage {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn write_bmp(
+pub unsafe extern "C" fn write_bmp(
 	s: *const c_char,
 	img: *mut BmpImage,
 ) -> *const c_char {
@@ -195,7 +194,7 @@ pub extern "C" fn write_bmp(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn index(
+pub unsafe extern "C" fn index(
 	img: *mut BmpImage,
 	x: c_ulong,
 	y: c_ulong,
@@ -212,7 +211,7 @@ pub extern "C" fn index(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn read_pixel(
+pub unsafe extern "C" fn read_pixel(
 	img: *mut BmpImage,
 	x: c_ulong,
 	y: c_ulong,
@@ -224,7 +223,7 @@ pub extern "C" fn read_pixel(
 	if img.is_null() {
 		return fail();
 	}
-	let idx = index(img, x, y);
+	let idx = unsafe { index(img, x, y) };
 	if idx == c_ulong::MAX {
 		return fail();
 	}
@@ -239,7 +238,7 @@ pub extern "C" fn read_pixel(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn set_pixel(
+pub unsafe extern "C" fn set_pixel(
 	img: *mut BmpImage,
 	x: c_ulong,
 	y: c_ulong,
@@ -248,7 +247,7 @@ pub extern "C" fn set_pixel(
 	if img.is_null() {
 		return false;
 	}
-	let idx = index(img, x, y);
+	let idx = unsafe { index(img, x, y) };
 	if idx == c_ulong::MAX {
 		return false;
 	}
@@ -267,7 +266,7 @@ pub extern "C" fn set_pixel(
 // ---------------------------------------------------------------------
 
 #[unsafe(no_mangle)]
-pub extern "C" fn merge(
+pub unsafe extern "C" fn merge(
 	img1: *const BmpImage,
 	img2: *const BmpImage,
 	blend: f32,
@@ -328,7 +327,7 @@ pub extern "C" fn merge(
 // new_bottom = height - bottom
 
 #[unsafe(no_mangle)]
-pub extern "C" fn margin(
+pub unsafe extern "C" fn margin(
 	img: *const BmpImage,
 	marg: Margin,
 	fill: Pixel,
@@ -385,7 +384,7 @@ pub extern "C" fn margin(
 // исходных пикселей, попавших в его «ячейку».
 
 #[unsafe(no_mangle)]
-pub extern "C" fn shrink(
+pub unsafe extern "C" fn shrink(
 	img: *const BmpImage,
 	new_width: c_ulong,
 	new_height: c_ulong,
@@ -409,8 +408,8 @@ pub extern "C" fn shrink(
 	let mut out = Vec::with_capacity(total);
 	for ny in 0..new_height {
 		let sy0 = ((ny as c_ulong * b.height as c_ulong) / new_height as c_ulong) as c_ulong;
-		let mut sy1 = (((ny as c_ulong + 1) * b.height as c_ulong + new_height as c_ulong - 1)
-			/ new_height as c_ulong) as c_ulong;
+		let mut sy1 = ((ny as c_ulong + 1) * b.height as c_ulong + new_height as c_ulong - 1)
+			.div_ceil(new_height as c_ulong) as c_ulong;
 		if sy1 <= sy0 {
 			sy1 = sy0 + 1;
 		}
@@ -420,8 +419,8 @@ pub extern "C" fn shrink(
 
 		for nx in 0..new_width {
 			let sx0 = ((nx as c_ulong * b.width as c_ulong) / new_width as c_ulong) as c_ulong;
-			let mut sx1 = (((nx as c_ulong + 1) * b.width as c_ulong + new_width as c_ulong - 1)
-				/ new_width as c_ulong) as c_ulong;
+			let mut sx1 = ((nx as c_ulong + 1) * b.width as c_ulong + new_width as c_ulong - 1)
+				.div_ceil(new_height as c_ulong) as c_ulong;
 			if sx1 <= sx0 {
 				sx1 = sx0 + 1;
 			}
