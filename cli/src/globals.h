@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
 /*
 
@@ -11,9 +12,9 @@
 */
 
 struct Config {
-    std::string input_path;
-    std::string output_path;
-    std::string watermark_path;
+    char* input_path;
+    char* output_path;
+    char* watermark_path;
 };
 
 /*
@@ -55,3 +56,5 @@ struct Error {
 */
 
 extern Error* ErrorConstructor(char* error_message_arg, int error_code_arg);
+
+#endif

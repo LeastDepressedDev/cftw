@@ -16,11 +16,7 @@ int main(int argc, char** argv){
     // Parsing Arguments
 	ParseArguments(argc, argv, config);
 
- 
-    std::cout << config->input_path << "\n";
-    std::cout << config->output_path << "\n";
-    std::cout << config->watermark_path << "\n";
-        
+    std::cout << BMPprocessor(config);
 
-	return 0;	
+    return 0;	
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CLI_H
+#define CLI_H
 
 #include <iostream>
 #include <string>
@@ -8,9 +9,10 @@
 #include "globals.h"
 
 // errors
-const Error kUnknownFlagError          = {(char*)"unknown flag", -1};
-const Error kWrongUsageError           = {(char*)"wrong usage", -2};
-const Error kWrongArgumentError        = {(char*)"wrong argument", -3};
+const Error kUnknownFlagError           = {(char*)"unknown flag", -1};
+const Error kWrongUsageError            = {(char*)"wrong usage", -2};
+const Error kWrongArgumentError         = {(char*)"wrong argument", -3};
+const Error kEmptyFlagError              = {(char*)"empty flag", -4};
 
 // long flags
 const std::string kHelpLong             = "--help";
@@ -59,7 +61,7 @@ extern void PrintHelp();
 
 */
 
-extern std::string NextArg(int argc, char** argv, int i);
+extern char* NextArg(int argc, char** argv, int i);
 
 /*
     
@@ -76,3 +78,5 @@ extern std::string NextArg(int argc, char** argv, int i);
 */
 
 extern void ParseArguments(int argc, char** argv, Config* config);
+
+#endif
