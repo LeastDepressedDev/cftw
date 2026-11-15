@@ -76,17 +76,17 @@ extern const char* write_bmp(const char* path, BmpImage* img);
 /*
  * 2D → 1D index. Returns UINT32_MAX when (x, y) is out of bounds.
  */
-extern unsigned int index(BmpImage* img, unsigned int x, unsigned int y);
+extern unsigned long index(BmpImage* img, unsigned long x, unsigned long y);
 
 /*
  * Safely reads a pixel. On failure returns tag=1 (result is meaningless).
  */
-extern ResultPixel read_pixel(BmpImage* img, unsigned int x, unsigned int y);
+extern ResultPixel read_pixel(BmpImage* img, unsigned long x, unsigned long y);
 
 /*
  * Safely sets a pixel. Returns non-zero on success.
  */
-extern unsigned char set_pixel(BmpImage* img, unsigned int x, unsigned int y, Pixel color);
+extern unsigned char set_pixel(BmpImage* img, unsigned long x, unsigned long y, Pixel color);
 
 /*
  * Blend img1 and img2: result = img1 * (1 - blend) + img2 * blend.
