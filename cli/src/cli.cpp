@@ -65,18 +65,18 @@ void PrintHelp(){
 
 */
 
-std::string NextArg(int argc, char** argv, int i){
+char* NextArg(int argc, char** argv, int i){
     if (i + 1 >= argc){
         Raise(kWrongUsageError);
     }else{
         if (argv[i + 1][0] != '-'){
-            return std::string(argv[i + 1]);
+            return argv[i + 1];
         }
         else {
             Raise(kWrongUsageError);
         }
     }
-    return "";
+    return nullptr;
 }
 
 /*
@@ -115,12 +115,15 @@ void ParseArguments(int argc, char** argv, Config* config){
 
             // \0 check
             if (argv[i][1] == '\0'){
-                Raise(kWrongUsageError);
+                Raise(kEmptyFlagError);
             }
 
             // Long Flags
 
             else if (argv[i][1] == '-'){
+                if (argv[i][2] == '\0') {
+                    Raise(kEmptyFlagError);
+                }
 
                 std::string flag = std::string(argv[i]);
 
@@ -192,14 +195,14 @@ void ParseArguments(int argc, char** argv, Config* config){
 
     // Validity check
     
-    if (config->input_path.empty()){
-        Raise(kWrongArgumentError);
+    if (config->input_path == NULL){
+        Raise(kWrongUsageError);
     }
-    if (config->output_path.empty()){
-        Raise(kWrongArgumentError);
+    if (config->output_path == NULL){
+        Raise(kWrongUsageError);
     }
-    if (config->watermark_path.empty()){
-        Raise(kWrongArgumentError);
+    if (config->watermark_path == NULL){
+        Raise(kWrongUsageError);
     }
 }
 
