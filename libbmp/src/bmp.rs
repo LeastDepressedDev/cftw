@@ -574,6 +574,21 @@ pub struct BmpHeader {
 	pixel_offset: u32,
 }
 
+#[allow(unused)]
+impl BmpHeader {
+	fn new(
+		header_size: u32,
+		data_size: u32,
+	) -> BmpHeader {
+		BmpHeader {
+			file_size: header_size + data_size,
+			creator1: 0,
+			creator2: 0,
+			pixel_offset: header_size,
+		}
+	}
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BmpDibHeader {
 	header_size: u32,
@@ -622,6 +637,7 @@ pub struct Image {
 	pub data: Vec<Pixel>,
 }
 
+#[allow(unused)]
 impl Image {
 	pub fn save<P: AsRef<Path>>(
 		&self,
