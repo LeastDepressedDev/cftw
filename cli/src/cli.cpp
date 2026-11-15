@@ -196,13 +196,13 @@ void ParseArguments(int argc, char** argv, Config* config){
     // Validity check
     
     if (config->input_path == NULL){
-        Raise(kWrongUsageError);
+        Raise(kWrongArgumentError);
     }
     if (config->output_path == NULL){
-        Raise(kWrongUsageError);
+        Raise(kWrongArgumentError);
     }
     if (config->watermark_path == NULL){
-        Raise(kWrongUsageError);
+        Raise(kWrongArgumentError);
     }
 }
 
