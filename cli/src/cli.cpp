@@ -51,7 +51,8 @@ void PrintHelp(){
     std::cout << " " << std::left << std::setw(50) << "-p, --padding <x-padding> [<y-padding>]" << "Set padding. If y-padding is omitted, defaults to x-padding.\n";
     std::cout << " " << std::left << std::setw(50) << "-c, --corner <position>" << "Set corner position.\n";
     std::cout << " " << std::left << std::setw(50) << "" << "Valid values: left-top, left-bottom, right-top, right-bottom.\n";
-
+    std::cout << " " << std::left << std::setw(50) << "-t, --tile <x> [<y>]" << "Tile pattern <x> times horizontally and <y> times vertically.\n";
+    std::cout << " " << std::left << std::setw(50) << "" << "If y in omitted, defaults to x.\n";
     std::cout << " " << std::left << std::setw(50) << "-h, --help" << "Display detailed description of configuration parameters and exit\n";
 
     exit(0);
