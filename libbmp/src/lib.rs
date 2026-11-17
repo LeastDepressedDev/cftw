@@ -21,6 +21,7 @@ pub struct BmpImage {
 	capacity: c_ulong, // == Vec::capacity
 	width: c_ulong,
 	height: c_ulong,
+	vec: [c_ulong; 3],
 	header: [u8; 12],
 	dib_header: [u8; 40],
 }
@@ -52,6 +53,7 @@ fn image_into_bmp(img: crate::bmp::Image) -> BmpImage {
 		width,
 		height,
 		data,
+		color_palette,
 		..
 	} = img;
 
@@ -63,6 +65,7 @@ fn image_into_bmp(img: crate::bmp::Image) -> BmpImage {
 			capacity: capacity as c_ulong,
 			width: width as c_ulong,
 			height: height as c_ulong,
+			vec: std::mem::transmute(color_palette),
 			header: std::mem::transmute(header),
 			dib_header: std::mem::transmute(dib_header),
 		}
@@ -102,6 +105,7 @@ fn ok_bmp(
 	data: Vec<Pixel>,
 	width: c_ulong,
 	height: c_ulong,
+	palette: [c_ulong; 3],
 	header: [u8; 12],
 	dib_header: [u8; 40],
 ) -> ResultBmpImage {
@@ -116,6 +120,7 @@ fn ok_bmp(
 			capacity: capacity as c_ulong,
 			width: width as c_ulong,
 			height: height as c_ulong,
+			vec: palette,
 			header,
 			dib_header,
 		})),
@@ -310,7 +315,7 @@ pub unsafe extern "C" fn merge(
 		));
 	}
 
-	ok_bmp(out, b1.width, b1.height, b1.header, b1.dib_header)
+	ok_bmp(out, b1.width, b1.height, [0; 3], b1.header, b1.dib_header)
 }
 
 // ---------------------------------------------------------------------
@@ -373,7 +378,7 @@ pub unsafe extern "C" fn margin(
 		}
 	}
 
-	ok_bmp(out, new_w, new_h, b.header, b.dib_header)
+	ok_bmp(out, new_w, new_h, [0; 3], b.header, b.dib_header)
 }
 
 // ---------------------------------------------------------------------
@@ -420,7 +425,7 @@ pub unsafe extern "C" fn shrink(
 		for nx in 0..new_width {
 			let sx0 = ((nx as c_ulong * b.width as c_ulong) / new_width as c_ulong) as c_ulong;
 			let mut sx1 = ((nx as c_ulong + 1) * b.width as c_ulong + new_width as c_ulong - 1)
-				.div_ceil(new_height as c_ulong) as c_ulong;
+				.div_ceil(new_width as c_ulong) as c_ulong;
 			if sx1 <= sx0 {
 				sx1 = sx0 + 1;
 			}
@@ -453,7 +458,7 @@ pub unsafe extern "C" fn shrink(
 		}
 	}
 
-	ok_bmp(out, new_width, new_height, b.header, b.dib_header)
+	ok_bmp(out, new_width, new_height, [0; 3], b.header, b.dib_header)
 }
 
 // =====================================================================
