@@ -312,7 +312,7 @@ mod decoder {
 		for _ in 0..height {
 			for _ in 0..width {
 				bmp_data.read_exact(&mut px)?;
-				data.push(px!(px[2], px[1], px[0], 1));
+				data.push(px!(px[2], px[1], px[0], 255));
 			}
 			bmp_data.seek(SeekFrom::Current(padding))?;
 		}
@@ -439,7 +439,7 @@ impl Pixel {
 		b: u8,
 		a: u8,
 	) -> Pixel {
-		Pixel { r, g, b, a}
+		Pixel { r, g, b, a }
 	}
 }
 

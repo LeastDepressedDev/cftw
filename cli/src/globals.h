@@ -20,6 +20,8 @@ struct Config {
     int corner;
     unsigned long x_padding;
     unsigned long y_padding;
+    unsigned long x_tile;
+    unsigned long y_tile;
 };
 
 /*

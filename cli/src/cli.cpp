@@ -203,6 +203,7 @@ void ParseArguments(int argc, char** argv, Config* config){
                         config->height = ToInt(WrongUsageHandler(arg2));
                     }
                 }
+
                 // --padding
                 else if (flag == kPaddingLong){
                     config->x_padding = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
@@ -217,6 +218,17 @@ void ParseArguments(int argc, char** argv, Config* config){
                 // --corner
                 else if(flag == kCornerLong){
                     config->corner = ParseCorner(WrongUsageHandler(NextArg(argc, argv, i)));
+                }
+
+                // --tile
+                else if (flag == kTileLong){
+                    config->x_tile = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+                    char* arg2 = NextArg(argc, argv, i + 1);
+                    if (arg2 == nullptr) {
+                        config->y_tile = config->x_tile;
+                    }else {
+                        config->y_tile = ToInt(WrongUsageHandler(arg2));
+                    }
                 }
 
                 // Unknown flag exeption
@@ -282,6 +294,17 @@ void ParseArguments(int argc, char** argv, Config* config){
                             config->corner = ParseCorner(WrongUsageHandler(NextArg(argc, argv, i)));
                             break;
 
+                        case(kTileShort): {
+                            config->x_tile = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+                            char* arg2 = NextArg(argc, argv, i + 1);
+                            if (arg2 == nullptr) {
+                                config->y_tile = config->x_tile;
+                            }else {
+                                config->y_tile = ToInt(WrongUsageHandler(arg2));
+                            }
+                            break;
+                        }
+
                         // Unknown flag exeption
                         default:
                             Raise(kUnknownFlagError);
@@ -311,6 +334,12 @@ void ParseArguments(int argc, char** argv, Config* config){
     }
     if (config->height == 0){
         Raise(kWrongSizeError);
+    }
+    if (config->x_tile == 0){
+        Raise(kWrongArgumentError);
+    }
+    if (config->y_tile == 0){
+        Raise(kWrongArgumentError);
     }
 }
 

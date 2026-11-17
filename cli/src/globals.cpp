@@ -24,6 +24,8 @@ Config* ConfigConstructor(){
     res->width = -1;
     res->height = -1;
     res->corner = 0;
+    res->x_tile = 1;
+    res->y_tile = 1;
 
     return res;
 }

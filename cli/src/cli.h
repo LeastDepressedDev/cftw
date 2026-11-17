@@ -24,6 +24,7 @@ const std::string kWatermarkLong        = "--watermark";
 const std::string kSizeLong             = "--size";
 const std::string kPaddingLong          = "--padding";
 const std::string kCornerLong           = "--corner";
+const std::string kTileLong             = "--tile";
 
 // short flags
 const char kHelpShort                   = 'h';
@@ -33,12 +34,7 @@ const char kWatermarkShort              = 'w';
 const char kSizeShort                   = 's';
 const char kPaddingShort                = 'p';
 const char kCornerShort                 = 'c';
-
-const char* const kLeftBottomArg        = "left-bottom";
-const char* const kLeftTopArg           = "left-top";
-const char* const kRightBottomArg       = "right-bottom";
-const char* const kRightTopArg          = "right-top";
-
+const char kTileShort                   = 't';
 
 extern int ParseCorner(char* arg);
 
