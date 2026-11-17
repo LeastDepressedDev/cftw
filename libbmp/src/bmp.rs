@@ -7,11 +7,12 @@ pub use decoder::{BmpError, BmpErrorKind, BmpResult};
 
 #[macro_export]
 macro_rules! px {
-	($r:expr, $g:expr, $b:expr) => {
+	($r:expr, $g:expr, $b:expr, $a:expr) => {
 		Pixel {
 			r: $r as u8,
 			g: $g as u8,
 			b: $b as u8,
+			a: $a as u8,
 		}
 	};
 }
@@ -267,7 +268,7 @@ mod decoder {
 		let mut color_palette = Vec::with_capacity(num_entries);
 		for _ in 0..num_entries {
 			bmp_data.read_exact(px)?;
-			color_palette.push(px!(px[2], px[1], px[0]));
+			color_palette.push(px!(px[2], px[1], px[0], 1));
 		}
 
 		Ok(Some(color_palette))
@@ -311,7 +312,7 @@ mod decoder {
 		for _ in 0..height {
 			for _ in 0..width {
 				bmp_data.read_exact(&mut px)?;
-				data.push(px!(px[2], px[1], px[0]));
+				data.push(px!(px[2], px[1], px[0], 1));
 			}
 			bmp_data.seek(SeekFrom::Current(padding))?;
 		}
@@ -428,6 +429,7 @@ pub struct Pixel {
 	pub r: u8,
 	pub g: u8,
 	pub b: u8,
+	pub a: u8,
 }
 
 impl Pixel {
@@ -435,8 +437,9 @@ impl Pixel {
 		r: u8,
 		g: u8,
 		b: u8,
+		a: u8,
 	) -> Pixel {
-		Pixel { r, g, b }
+		Pixel { r, g, b, a}
 	}
 }
 

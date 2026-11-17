@@ -222,7 +222,7 @@ pub unsafe extern "C" fn read_pixel(
 	y: c_ulong,
 ) -> ResultPixel {
 	let fail = || ResultPixel {
-		data: Pixel::new(0, 0, 0),
+		data: Pixel::new(0, 0, 0, 0),
 		tag: 1,
 	};
 	if img.is_null() {
@@ -279,6 +279,7 @@ pub unsafe extern "C" fn merge(
 	if img1.is_null() || img2.is_null() {
 		return err_bmp("merge: null argument", 2);
 	}
+
 	let b1 = unsafe { &*img1 };
 	let b2 = unsafe { &*img2 };
 
@@ -301,17 +302,19 @@ pub unsafe extern "C" fn merge(
 	} else {
 		blend.clamp(0.0, 1.0)
 	};
-	let inv = 1.0 - blend;
 
 	let mut out = Vec::with_capacity(expected);
 	for (a, b) in d1
 		.iter()
 		.zip(d2.iter())
 	{
+		let coef = (b.a as f32) / 255.0;
+		let inv = 1.0 - blend * coef;
 		out.push(Pixel::new(
-			(a.r as f32 * inv + b.r as f32 * blend) as u8,
-			(a.g as f32 * inv + b.g as f32 * blend) as u8,
-			(a.b as f32 * inv + b.b as f32 * blend) as u8,
+			(a.r as f32 * inv + b.r as f32 * blend * coef) as u8,
+			(a.g as f32 * inv + b.g as f32 * blend * coef) as u8,
+			(a.b as f32 * inv + b.b as f32 * blend * coef) as u8,
+			(255) as u8,
 		));
 	}
 
@@ -454,6 +457,7 @@ pub unsafe extern "C" fn shrink(
 				(r_sum / count) as u8,
 				(g_sum / count) as u8,
 				(b_sum / count) as u8,
+				(255) as u8,
 			));
 		}
 	}
