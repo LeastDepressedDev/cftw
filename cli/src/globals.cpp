@@ -19,6 +19,12 @@ Config* ConfigConstructor(){
     res->output_path = nullptr;
     res->watermark_path = nullptr;
 
+    res->x_padding = 0;
+    res->y_padding = 0;
+    res->width = -1;
+    res->height = -1;
+    res->corner = 0;
+
     return res;
 }
 
