@@ -7,14 +7,15 @@ extern "C" {
 #endif
 
 typedef struct Margin {
-    int32_t left, top;
-    int32_t right, bottom;
+    int32_t left, bottom;
+    int32_t right, top;
 } Margin;
 
 typedef struct Pixel {
     unsigned char r;
     unsigned char g;
     unsigned char b;
+    unsigned char a;
 } Pixel;
 
 /*
@@ -24,12 +25,12 @@ typedef struct Pixel {
 typedef struct BmpImage {
     Pixel*        ptrRawData;
     unsigned long ulRawDataSize;        /* number of Pixels in ptrRawData */
-    unsigned long ulRawDataCap;    /* allocated capacity, in Pixels */
-    unsigned long ulWidth;       /* width in pixels */
-    unsigned long ulHeight;      /* height in pixels */
+    unsigned long ulRawDataCap;         /* allocated capacity, in Pixels */
+    unsigned long ulWidth;              /* width in pixels */
+    unsigned long ulHeight;             /* height in pixels */
     unsigned long Palette[3];
-    unsigned char header[12];  /* BITMAPFILEHEADER bytes */
-    unsigned char dib_header[40]; /* BITMAPINFOHEADER bytes */
+    unsigned char header[12];           /* BITMAPFILEHEADER bytes */
+    unsigned char dib_header[40];       /* BITMAPINFOHEADER bytes */
 } BmpImage;
 
 /* ---------------------------------------------------------------- *
@@ -37,18 +38,18 @@ typedef struct BmpImage {
  * ---------------------------------------------------------------- */
 
 typedef struct ResultBmpImage {
-    const char*   ptr;      /* \0-terminated string on error, else NULL */
-    BmpImage*     resultPtr; /* NULL on error */
+    const char*   ptr;                  /* \0-terminated string on error, else NULL */
+    BmpImage*     resultPtr;            /* NULL on error */
     unsigned char opFlag;
 } ResultBmpImage;
 
 typedef struct ResultPixel {
-    Pixel         result; /* valid only if opFlag == FLAG_OBMP_OK */
+    Pixel         result;               /* valid only if opFlag == FLAG_OBMP_OK */
     unsigned char opFlag;
 } ResultPixel;
 
 #define FLAG_OBMP_OK          0
-#define FLAG_OBMP_WMN         1 /* wrong magic numbers */
+#define FLAG_OBMP_WMN         1         /* wrong magic numbers */
 #define FLAG_OBMP_UNSUPPORTED 2
 #define FLAG_OBMP_IO          3
 

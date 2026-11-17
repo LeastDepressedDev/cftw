@@ -12,19 +12,31 @@
 const Error kUnknownFlagError           = {(char*)"unknown flag", -1};
 const Error kWrongUsageError            = {(char*)"wrong usage", -2};
 const Error kWrongArgumentError         = {(char*)"wrong argument", -3};
-const Error kEmptyFlagError              = {(char*)"empty flag", -4};
+const Error kEmptyFlagError             = {(char*)"empty flag", -4};
+const Error kWrongCornerError           = {(char*)"wrong argument\nAvailable options: left-top, left-bottom, right-top, right-bottom.", -3};
+const Error kWrongSizeError             = {(char*)"wrong argument\nSize must be greater than 0", -3};
 
 // long flags
 const std::string kHelpLong             = "--help";
 const std::string kInputLong            = "--input";
 const std::string kOutputLong           = "--output";
 const std::string kWatermarkLong        = "--watermark";
+const std::string kSizeLong             = "--size";
+const std::string kPaddingLong          = "--padding";
+const std::string kCornerLong           = "--corner";
+const std::string kTileLong             = "--tile";
 
 // short flags
 const char kHelpShort                   = 'h';
 const char kInputShort                  = 'i';
 const char kOutputShort                 = 'o';
 const char kWatermarkShort              = 'w';
+const char kSizeShort                   = 's';
+const char kPaddingShort                = 'p';
+const char kCornerShort                 = 'c';
+const char kTileShort                   = 't';
+
+extern int ParseCorner(char* arg);
 
 /*
 
