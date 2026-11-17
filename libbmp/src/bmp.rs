@@ -607,7 +607,6 @@ impl Image {
 		&self,
 		path: P,
 	) -> std::io::Result<()> {
-		println!("{:?}", self);
 		self.to_writer(&mut std::fs::File::create(path)?)
 	}
 
@@ -624,9 +623,7 @@ impl Image {
 pub fn open<P: AsRef<Path>>(path: P) -> BmpResult<Image> {
 	let mut bytes = Vec::new();
 	std::fs::File::open(path)?.read_to_end(&mut bytes)?;
-	let t = decoder::decode_image(&mut Cursor::new(bytes));
-	println!("{:?}", t);
-	t
+	decoder::decode_image(&mut Cursor::new(bytes))
 }
 
 impl fmt::Debug for Image {
