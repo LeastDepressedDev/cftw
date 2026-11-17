@@ -26,7 +26,7 @@ typedef struct BmpImage {
     unsigned long ulRawDataSize;        /* number of Pixels in ptrRawData */
     unsigned long ulRawDataCap;    /* allocated capacity, in Pixels */
     unsigned long ulWidth;       /* width in pixels */
-    unsigned long wlHeight;      /* height in pixels */
+    unsigned long ulHeight;      /* height in pixels */
     unsigned long vec[3];
     unsigned char header[12];  /* BITMAPFILEHEADER bytes */
     unsigned char dib_header[40]; /* BITMAPINFOHEADER bytes */
