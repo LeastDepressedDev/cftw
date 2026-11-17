@@ -1,5 +1,5 @@
 #include <iostream>
-#include <bmplib.h>
+#include "../include/bmplib.h"
 
 #include "globals.h"
 #include "processor.h"
@@ -9,6 +9,7 @@ int BMPprocessor(Config *config) {
     ResultBmpImage wm_img = open_bmp((const char*)config->watermark_path);
 
     if (input_img.opFlag != FLAG_OBMP_OK) {
+      std::cout << input_img.ptr << std::endl;
         return input_img.opFlag;
     }
     if (wm_img.opFlag != FLAG_OBMP_OK) {
@@ -16,7 +17,7 @@ int BMPprocessor(Config *config) {
     }
 
     ResultBmpImage wm2_img = shrink(wm_img.resultPtr, 200, 200);
-    
+
     if (wm2_img.opFlag != FLAG_OBMP_OK) {
         return wm2_img.opFlag;
     }
@@ -27,12 +28,12 @@ int BMPprocessor(Config *config) {
     //}
 
     //BmpImage* img = (BmpImage*)malloc(sizeof(BmpImage));
-   
+
     std::cout << (int)((char*)&wm_img.resultPtr->ulWidth)[4] << " " << wm_img.resultPtr->wlHeight << "\n";
     std::cout << wm_img.resultPtr->ulRawDataSize << " " << wm_img.resultPtr->ulRawDataCap << "\n";
 
     std::cout << write_bmp(config->output_path, wm2_img.resultPtr);
-    
+
     free_bmp(input_img.resultPtr);
     free_bmp(wm_img.resultPtr);
     free_bmp(wm2_img.resultPtr);

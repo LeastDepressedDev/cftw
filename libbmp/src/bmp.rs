@@ -25,54 +25,31 @@ macro_rules! file_size {
 }
 
 mod bytes {
+	use std::io::{Cursor, Read};
 	#[inline]
-	pub fn read_u16(buf: &[u8]) -> u16 {
-		u16::from_le_bytes(
-			buf[..2]
-				.try_into()
-				.unwrap(),
-		)
+	pub fn read_u16(buf: &mut Cursor<Vec<u8>>) -> u16 {
+		let mut t = [0u8; 2];
+		buf
+			.read_exact(&mut t)
+			.unwrap();
+		u16::from_le_bytes(t)
 	}
 
 	#[inline]
-	pub fn read_u32(buf: &[u8]) -> u32 {
-		u32::from_le_bytes(
-			buf[..4]
-				.try_into()
-				.unwrap(),
-		)
+	pub fn read_u32(buf: &mut Cursor<Vec<u8>>) -> u32 {
+		let mut t = [0u8; 4];
+		buf
+			.read_exact(&mut t)
+			.unwrap();
+		u32::from_le_bytes(t)
 	}
 
-	pub fn read_i32(buf: &[u8]) -> i32 {
-		i32::from_le_bytes(
-			buf[..4]
-				.try_into()
-				.unwrap(),
-		)
-	}
-
-	#[inline]
-	pub fn write_u16(
-		buf: &mut [u8],
-		n: u16,
-	) {
-		buf[..2].copy_from_slice(&n.to_le_bytes());
-	}
-
-	#[inline]
-	pub fn write_u32(
-		buf: &mut [u8],
-		n: u32,
-	) {
-		buf[..4].copy_from_slice(&n.to_le_bytes());
-	}
-
-	#[inline]
-	pub fn write_i32(
-		buf: &mut [u8],
-		n: i32,
-	) {
-		buf[..4].copy_from_slice(&n.to_le_bytes())
+	pub fn read_i32(buf: &mut Cursor<Vec<u8>>) -> i32 {
+		let mut t = [0u8; 4];
+		buf
+			.read_exact(&mut t)
+			.unwrap();
+		i32::from_le_bytes(t)
 	}
 }
 
@@ -81,7 +58,7 @@ mod decoder {
 	use std::convert::{AsRef, From};
 	use std::error::Error;
 	use std::fmt;
-	use std::io::{self, Cursor, Read, Seek, SeekFrom};
+	use std::io::{self, Read, Seek, SeekFrom};
 
 	const BMP_HEADER_SIZE: u64 = 14;
 
@@ -209,10 +186,10 @@ mod decoder {
 
 	fn read_bmp_header(bmp_data: &mut Cursor<Vec<u8>>) -> BmpResult<BmpHeader> {
 		let header = BmpHeader {
-			file_size: read_u32(bmp_data.get_ref()),
-			creator1: read_u16(bmp_data.get_ref()),
-			creator2: read_u16(bmp_data.get_ref()),
-			pixel_offset: read_u32(bmp_data.get_ref()),
+			file_size: read_u32(bmp_data),
+			creator1: read_u16(bmp_data),
+			creator2: read_u16(bmp_data),
+			pixel_offset: read_u32(bmp_data),
 		};
 
 		Ok(header)
@@ -220,17 +197,17 @@ mod decoder {
 
 	fn read_bmp_dib_header(bmp_data: &mut Cursor<Vec<u8>>) -> BmpResult<BmpDibHeader> {
 		let dib_header = BmpDibHeader {
-			header_size: read_u32(bmp_data.get_ref()),
-			width: read_i32(bmp_data.get_ref()),
-			height: read_i32(bmp_data.get_ref()),
-			num_planes: read_u16(bmp_data.get_ref()),
-			bits_per_pixel: read_u16(bmp_data.get_ref()),
-			compress_type: read_u32(bmp_data.get_ref()),
-			data_size: read_u32(bmp_data.get_ref()),
-			hres: read_i32(bmp_data.get_ref()),
-			vres: read_i32(bmp_data.get_ref()),
-			num_colors: read_u32(bmp_data.get_ref()),
-			num_imp_colors: read_u32(bmp_data.get_ref()),
+			header_size: read_u32(bmp_data),
+			width: read_i32(bmp_data),
+			height: read_i32(bmp_data),
+			num_planes: read_u16(bmp_data),
+			bits_per_pixel: read_u16(bmp_data),
+			compress_type: read_u32(bmp_data),
+			data_size: read_u32(bmp_data),
+			hres: read_i32(bmp_data),
+			vres: read_i32(bmp_data),
+			num_colors: read_u32(bmp_data),
+			num_imp_colors: read_u32(bmp_data),
 		};
 
 		match BmpVersion::from_dib_header(&dib_header) {
@@ -391,69 +368,57 @@ mod decoder {
 	}
 }
 mod encoder {
-	use super::bytes::*;
-
-	use std::io::{self, Write};
-
-	use super::Image;
-
-	const B: u8 = 66;
-	const M: u8 = 77;
+	use super::*;
+	// encoder.rs (фрагмент)
+	const FILE_HEADER_SIZE: u32 = 14; // "BM" + 12 байт
+	const DIB_HEADER_SIZE: u32 = 40; // BITMAPINFOHEADER
+	const PIXEL_OFFSET: u32 = FILE_HEADER_SIZE + DIB_HEADER_SIZE; // 54
 
 	pub fn encode_image(bmp_image: &Image) -> std::io::Result<Vec<u8>> {
-		let mut bmp_data = Vec::with_capacity(
-			bmp_image
-				.header
-				.file_size as usize,
-		);
+		// Вычисляем размер пиксельных данных с учётом padding для 24-бит
+		let row_size = ((bmp_image.width * 3 + 3) & !3) as u32; // округление до 4
+		let data_size = row_size * bmp_image.height;
+		let file_size = PIXEL_OFFSET + data_size;
 
-		write_header(&mut bmp_data, bmp_image)?;
-		write_data(&mut bmp_data, bmp_image)?;
-		Ok(bmp_data)
-	}
+		let mut bmp_data = Vec::with_capacity(file_size as usize);
 
-	fn write_header(
-		bmp_data: &mut Vec<u8>,
-		img: &Image,
-	) -> std::io::Result<()> {
-		let header = &img.header;
-		let dib_header = &img.dib_header;
-		let (header_size, data_size) = file_size!(24, img.width, img.height);
+		// --- File Header (14 байт) ---
+		bmp_data.extend_from_slice(b"BM");
+		bmp_data.extend_from_slice(&file_size.to_le_bytes()); // размер файла
+		bmp_data.extend_from_slice(&0u16.to_le_bytes()); // зарезервировано
+		bmp_data.extend_from_slice(&0u16.to_le_bytes()); // зарезервировано
+		bmp_data.extend_from_slice(&PIXEL_OFFSET.to_le_bytes()); // смещение пикселей
 
-		io::Write::write(bmp_data, &[B, M])?;
+		// --- DIB Header (40 байт, BITMAPINFOHEADER) ---
+		bmp_data.extend_from_slice(&DIB_HEADER_SIZE.to_le_bytes());
+		bmp_data.extend_from_slice(&(bmp_image.width as i32).to_le_bytes());
+		bmp_data.extend_from_slice(&(bmp_image.height as i32).to_le_bytes());
+		bmp_data.extend_from_slice(&1u16.to_le_bytes()); // planes
+		bmp_data.extend_from_slice(&24u16.to_le_bytes()); // bpp
+		bmp_data.extend_from_slice(&0u32.to_le_bytes()); // compression = BI_RGB
+		bmp_data.extend_from_slice(&data_size.to_le_bytes()); // размер пиксельных данных
+		bmp_data.extend_from_slice(&2835i32.to_le_bytes()); // hres (72 DPI)
+		bmp_data.extend_from_slice(&2835i32.to_le_bytes()); // vres
+		bmp_data.extend_from_slice(&0u32.to_le_bytes()); // colors used
+		bmp_data.extend_from_slice(&0u32.to_le_bytes()); // important colors
 
-		write_u32(bmp_data, header_size + data_size);
-		write_u16(bmp_data, header.creator1);
-		write_u16(bmp_data, header.creator2);
-		write_u32(bmp_data, header_size);
-		write_u32(bmp_data, dib_header.header_size);
-		write_i32(bmp_data, dib_header.width);
-		write_i32(bmp_data, dib_header.height);
-		write_u16(bmp_data, 1);
-		write_u16(bmp_data, 24);
-		write_u32(bmp_data, 0);
-		write_u32(bmp_data, data_size);
-		write_i32(bmp_data, dib_header.hres);
-		write_i32(bmp_data, dib_header.vres);
-		write_u32(bmp_data, 0);
-		write_u32(bmp_data, 0);
-		Ok(())
-	}
-
-	fn write_data(
-		bmp_data: &mut Vec<u8>,
-		img: &Image,
-	) -> std::io::Result<()> {
-		let padding = &[0; 4][0..img.padding as usize];
-		for y in 0..img.height {
-			for x in 0..img.width {
-				let index = (y * img.width + x) as usize;
-				let px = &img.data[index];
-				Write::write(bmp_data, &[px.b, px.g, px.r])?;
+		// --- Пиксельные данные (BGR + padding) ---
+		let padding = (4 - (bmp_image.width * 3 % 4)) % 4;
+		for y in 0..bmp_image.height {
+			for x in 0..bmp_image.width {
+				let idx = (y * bmp_image.width + x) as usize;
+				let px = &bmp_image.data[idx];
+				bmp_data.push(px.b);
+				bmp_data.push(px.g);
+				bmp_data.push(px.r);
 			}
-			Write::write(bmp_data, padding)?;
+			// padding
+			for _ in 0..padding {
+				bmp_data.push(0);
+			}
 		}
-		Ok(())
+
+		Ok(bmp_data)
 	}
 }
 
@@ -637,12 +602,12 @@ pub struct Image {
 	pub data: Vec<Pixel>,
 }
 
-#[allow(unused)]
 impl Image {
 	pub fn save<P: AsRef<Path>>(
 		&self,
 		path: P,
 	) -> std::io::Result<()> {
+		println!("{:?}", self);
 		self.to_writer(&mut std::fs::File::create(path)?)
 	}
 
@@ -659,5 +624,23 @@ impl Image {
 pub fn open<P: AsRef<Path>>(path: P) -> BmpResult<Image> {
 	let mut bytes = Vec::new();
 	std::fs::File::open(path)?.read_to_end(&mut bytes)?;
-	decoder::decode_image(&mut Cursor::new(bytes))
+	let t = decoder::decode_image(&mut Cursor::new(bytes));
+	println!("{:?}", t);
+	t
+}
+
+impl fmt::Debug for Image {
+	fn fmt(
+		&self,
+		f: &mut fmt::Formatter,
+	) -> Result<(), fmt::Error> {
+		f.debug_struct("Image")
+			.field("header", &self.header)
+			.field("dib_header", &self.dib_header)
+			.field("color_palette", &self.color_palette)
+			.field("width", &self.width)
+			.field("height", &self.height)
+			.field("padding", &self.padding)
+			.finish()
+	}
 }
