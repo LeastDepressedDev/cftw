@@ -9,13 +9,14 @@ int BMPprocessor(Config *config) {
     ResultBmpImage wm_img = open_bmp((const char*)config->watermark_path);
 
     if (input_img.opFlag != FLAG_OBMP_OK) {
-        std::cout << input_img.ptr << std::endl;
+        std::cerr << input_img.ptr << std::endl;
         free_string(input_img.ptr);
         free_bmp(input_img.resultPtr);
+        free_bmp(wm_img.resultPtr);
         return input_img.opFlag;
     }
     if (wm_img.opFlag != FLAG_OBMP_OK) {
-        std::cout << wm_img.ptr << std::endl;
+        std::cerr << wm_img.ptr << std::endl;
         free_string(wm_img.ptr);
         free_bmp(input_img.resultPtr);
         free_bmp(wm_img.resultPtr);
@@ -33,7 +34,7 @@ int BMPprocessor(Config *config) {
     ResultBmpImage wm_sized_img = shrink(wm_img.resultPtr, result_width, result_height);
 
     if (wm_sized_img.opFlag != FLAG_OBMP_OK) {
-        std::cout << wm_sized_img.ptr << std::endl;
+        std::cerr << wm_sized_img.ptr << std::endl;
         free_string(wm_sized_img.ptr);
         free_bmp(input_img.resultPtr);
         free_bmp(wm_img.resultPtr);
@@ -72,7 +73,7 @@ int BMPprocessor(Config *config) {
             wm_margin_img = margin(wm_sized_img.resultPtr, padding, pixel);
 
             if (wm_margin_img.opFlag != FLAG_OBMP_OK) {
-                std::cout << wm_margin_img.ptr << std::endl;
+                std::cerr << wm_margin_img.ptr << std::endl;
                 free_string(wm_margin_img.ptr);
                 free_bmp(input_img.resultPtr);
                 free_bmp(wm_img.resultPtr);
@@ -83,7 +84,7 @@ int BMPprocessor(Config *config) {
 
             result_img = merge(result_img.resultPtr, wm_margin_img.resultPtr, 0.5);
             if (result_img.opFlag != FLAG_OBMP_OK) {
-                std::cout << result_img.ptr << std::endl;
+                std::cerr << result_img.ptr << std::endl;
                 free_string(result_img.ptr);
                 free_bmp(input_img.resultPtr);
                 free_bmp(wm_img.resultPtr);
