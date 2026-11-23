@@ -15,6 +15,13 @@ struct Config {
     char* input_path;
     char* output_path;
     char* watermark_path;
+    unsigned long width;
+    unsigned long height;
+    int corner;
+    unsigned long x_padding;
+    unsigned long y_padding;
+    unsigned long x_tile;
+    unsigned long y_tile;
 };
 
 /*
