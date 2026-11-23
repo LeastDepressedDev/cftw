@@ -16,7 +16,8 @@ int main(int argc, char** argv){
     // Parsing Arguments
 	ParseArguments(argc, argv, config);
 
-    std::cout << BMPprocessor(config);
+    // Calling MBP processor
+    BMPprocessor(config);
 
     return 0;
 }
