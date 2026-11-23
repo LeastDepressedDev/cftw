@@ -15,9 +15,9 @@ Config* ConfigConstructor(){
 
     // Config default values
     
-    res->input_path = "";
-    res->output_path = "";
-    res->watermark_path = "";
+    res->input_path = nullptr;
+    res->output_path = nullptr;
+    res->watermark_path = nullptr;
 
     return res;
 }
