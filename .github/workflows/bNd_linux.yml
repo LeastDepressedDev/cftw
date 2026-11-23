@@ -89,12 +89,11 @@ jobs:
           name: ${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }}
           path: ${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }}
       
-      # Deploy to server via SCP (example)
-      - name: Deploy to server
-        uses: appleboy/scp-action@v0.1.7
+      # Upload app
+      - name: Upload built app
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }}
-          target: "/var/www/app"
+          name: cftw
+          path: |
+            ${{env.ARTIFACT_FOLDER}}_v${{env.VERSION}}/cftw-cli
