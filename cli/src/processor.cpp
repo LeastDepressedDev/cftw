@@ -54,8 +54,8 @@ int BMPprocessor(Config *config) {
             Margin padding {0, 0, 0, 0};
             Pixel pixel = {0, 0, 0, 0};
 
-            top_padding = (config->y_padding + config->height) * j;
-            left_padding = (config->x_padding + config->width) * i;
+            top_padding = (config->y_padding + config->height) * j + config->y_padding;
+            left_padding = (config->x_padding + config->width) * i + config->x_padding;
             bottom_padding = input_img.resultPtr->ulHeight - result_height - top_padding;
             right_padding = input_img.resultPtr->ulWidth - result_width - left_padding;
 

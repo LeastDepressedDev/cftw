@@ -268,7 +268,7 @@ mod decoder {
 		let mut color_palette = Vec::with_capacity(num_entries);
 		for _ in 0..num_entries {
 			bmp_data.read_exact(px)?;
-			color_palette.push(px!(px[2], px[1], px[0], 1));
+			color_palette.push(px!(px[2], px[1], px[0], 255));
 		}
 
 		Ok(Some(color_palette))
