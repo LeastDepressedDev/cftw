@@ -100,7 +100,13 @@ unsigned long ToInt(char* arg) {
         }
         i++;
     }
-    return std::stoi(arg);
+    try {
+        return std::stoi(arg);
+    }
+    catch (...) {
+        Raise(kWrongArgumentError);
+    }
+    return 0;
 }
 
 /*
@@ -128,15 +134,237 @@ int ParseCorner(char* arg){
 
 /*
     
+    Long flags parser
+
+    Arguments:
+     int argc           - number of arguments
+     char** argv        - cl arguments
+     Config* config     - config
+     int i              - index of argument
+*/
+
+void ParseLongFlag(int argc, char** argv, Config* config, int i){
+    if (argv[i][2] == '\0') {
+        Raise(kEmptyFlagError);
+    }
+
+    std::string flag = std::string(argv[i]);
+
+    // --help
+    if (flag == kHelpLong){
+        PrintHelp();
+    }
+                
+    // --input
+    else if(flag == kInputLong){
+        config->input_path = WrongUsageHandler(NextArg(argc, argv, i));
+    }
+    
+    // --output
+    else if(flag == kOutputLong){
+        config->output_path = WrongUsageHandler(NextArg(argc, argv, i));
+    }
+
+    // --watermark
+    else if(flag == kWatermarkLong){
+        config->watermark_path = WrongUsageHandler(NextArg(argc, argv, i));    
+    }
+
+    // --size
+    else if (flag == kSizeLong){
+        config->width = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+        char* arg2 = NextArg(argc, argv, i + 1);
+        if (arg2 == nullptr) {
+            config->height = config->width;
+        }else {
+            config->height = ToInt(WrongUsageHandler(arg2));
+        }
+    }
+
+    // --padding
+    else if (flag == kPaddingLong){
+        config->x_padding = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+        char* arg2 = NextArg(argc, argv, i + 1);
+        if (arg2 == nullptr) {
+            config->y_padding = config->x_padding;
+        }else {
+            config->y_padding = ToInt(WrongUsageHandler(arg2));
+        }
+    }
+
+    // --corner
+    else if(flag == kCornerLong){
+        config->corner = ParseCorner(WrongUsageHandler(NextArg(argc, argv, i)));
+    }
+
+    // --tile
+    else if (flag == kTileLong){
+        config->x_tile = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+        char* arg2 = NextArg(argc, argv, i + 1);
+        if (arg2 == nullptr) {
+            config->y_tile = config->x_tile;
+        }else {
+            config->y_tile = ToInt(WrongUsageHandler(arg2));
+        }
+    }
+
+    // Unknown flag exeption
+    else {
+        Raise(kUnknownFlagError); 
+    }
+
+}
+
+/*
+    
+    Short flags parser
+
+    Arguments:
+     int argc           - number of arguments
+     char** argv        - cl arguments
+     Config* config     - config
+     int i              - index of argument
+
+*/
+
+void ParseShortFlag(int argc, char** argv, Config* config, int i){
+    int j = 1;
+
+    while (argv[i][j] != '\0'){
+        switch(argv[i][j]){
+            // -h
+            case(kHelpShort):
+                PrintHelp();
+                break;
+    
+            // -i
+            case(kInputShort):
+                config->input_path = WrongUsageHandler(NextArg(argc, argv, i + j - 1)); 
+                break;
+
+            // -o
+            case(kOutputShort):
+                config->output_path = WrongUsageHandler(NextArg(argc, argv, i + j - 1));
+                break;
+    
+            // -w
+            case(kWatermarkShort):
+                config->watermark_path = WrongUsageHandler(NextArg(argc, argv, i + j - 1));
+                break;
+       
+            // -s
+            case(kSizeShort): {
+                 
+                // if flag not sigle
+                if (j != 1 || argv[i][j + 1] != '\0') {
+                    Raise(kWrongUsageError);
+                }
+
+                config->width = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+                char* arg2 = NextArg(argc, argv, i + 1);
+                if (arg2 == nullptr) {
+                    config->height = config->width;
+                }else {
+                    config->height = ToInt(WrongUsageHandler(arg2));
+                }
+                break;
+            }
+
+            // -p
+            case(kPaddingShort): {
+
+                // if flag not sigle
+                if (j != 1 || argv[i][j + 1] != '\0') {
+                    Raise(kWrongUsageError);
+                }
+
+                config->x_padding = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+                char* arg2 = NextArg(argc, argv, i + 1);
+                if (arg2 == nullptr) {
+                    config->y_padding = config->x_padding;
+                }else {
+                    config->y_padding = ToInt(WrongUsageHandler(arg2));
+                }
+                            
+                break;
+            }
+
+            // -c
+            case(kCornerShort):
+                config->corner = ParseCorner(WrongUsageHandler(NextArg(argc, argv, i + j - 1)));
+                break;
+
+            // -t
+            case(kTileShort): {
+                
+                // if flag not sigle
+                if (j != 1 || argv[i][j + 1] != '\0') {
+                    Raise(kWrongUsageError);
+                }
+
+                config->x_tile = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
+                char* arg2 = NextArg(argc, argv, i + 1);
+                if (arg2 == nullptr) {
+                    config->y_tile = config->x_tile;
+                }else {
+                    config->y_tile = ToInt(WrongUsageHandler(arg2));
+                }
+                break;
+            }
+
+            // Unknown flag exeption
+            default:
+                Raise(kUnknownFlagError);
+                break;
+        }
+
+        j ++;
+
+    }
+
+}
+
+/*
+    
+    Config validity checker
+
+    Arguments:
+      Config* config     - config
+
+*/
+
+void Validation(Config* config) {
+    if (config->input_path == NULL){
+        Raise(kWrongArgumentError);
+    }
+    if (config->output_path == NULL){
+        Raise(kWrongArgumentError);
+    }
+    if (config->watermark_path == NULL){
+        Raise(kWrongArgumentError);
+    }
+    if (config->width == 0){
+        Raise(kWrongSizeError);
+    }
+    if (config->height == 0){
+        Raise(kWrongSizeError);
+    }
+    if (config->x_tile == 0){
+        Raise(kWrongArgumentError);
+    }
+    if (config->y_tile == 0){
+        Raise(kWrongArgumentError);
+    }
+}
+
+/*
+    
     Command line arguments parser
 
     Arguments:
      int argc           - number of arguments
      char** argv        - cl arguments
      Config* config     - config
-
-    Return:
-     int exitCode       - exit code
 
 */
 
@@ -168,179 +396,17 @@ void ParseArguments(int argc, char** argv, Config* config){
             // Long Flags
 
             else if (argv[i][1] == '-'){
-                if (argv[i][2] == '\0') {
-                    Raise(kEmptyFlagError);
-                }
-
-                std::string flag = std::string(argv[i]);
-
-                // --help
-                if (flag == kHelpLong){
-                    PrintHelp();
-                }
-                
-                // --input
-                else if(flag == kInputLong){
-                    config->input_path = WrongUsageHandler(NextArg(argc, argv, i));
-                }
-    
-                // --output
-                else if(flag == kOutputLong){
-                    config->output_path = WrongUsageHandler(NextArg(argc, argv, i));
-                }
-
-                // --watermark
-                else if(flag == kWatermarkLong){
-                    config->watermark_path = WrongUsageHandler(NextArg(argc, argv, i));    
-                }
-
-                // --size
-                else if (flag == kSizeLong){
-                    config->width = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
-                    char* arg2 = NextArg(argc, argv, i + 1);
-                    if (arg2 == nullptr) {
-                        config->height = config->width;
-                    }else {
-                        config->height = ToInt(WrongUsageHandler(arg2));
-                    }
-                }
-
-                // --padding
-                else if (flag == kPaddingLong){
-                    config->x_padding = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
-                    char* arg2 = NextArg(argc, argv, i + 1);
-                    if (arg2 == nullptr) {
-                        config->y_padding = config->x_padding;
-                    }else {
-                        config->y_padding = ToInt(WrongUsageHandler(arg2));
-                    }
-                }
-
-                // --corner
-                else if(flag == kCornerLong){
-                    config->corner = ParseCorner(WrongUsageHandler(NextArg(argc, argv, i)));
-                }
-
-                // --tile
-                else if (flag == kTileLong){
-                    config->x_tile = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
-                    char* arg2 = NextArg(argc, argv, i + 1);
-                    if (arg2 == nullptr) {
-                        config->y_tile = config->x_tile;
-                    }else {
-                        config->y_tile = ToInt(WrongUsageHandler(arg2));
-                    }
-                }
-
-                // Unknown flag exeption
-                else {
-                    Raise(kUnknownFlagError); 
-                }
+                ParseLongFlag(argc, argv, config, i);
             }
 
             // Sort Flags
 
             else{
-                int j = 1;
-
-                while (argv[i][j] != '\0'){
-                    switch(argv[i][j]){
-                        // -h
-                        case(kHelpShort):
-                            PrintHelp();
-                            break;
-    
-                        // -i
-                        case(kInputShort):
-                            config->input_path = WrongUsageHandler(NextArg(argc, argv, i)); 
-                        break;
-
-                        // -o
-                        case(kOutputShort):
-                            config->output_path = WrongUsageHandler(NextArg(argc, argv, i));
-                            break;
-    
-                        // -w
-                        case(kWatermarkShort):
-                            config->watermark_path = WrongUsageHandler(NextArg(argc, argv, i));
-                            break;
-       
-                        // -s
-                        case(kSizeShort): {
-                            config->width = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
-                            char* arg2 = NextArg(argc, argv, i + 1);
-                            if (arg2 == nullptr) {
-                                config->height = config->width;
-                            }else {
-                                config->height = ToInt(WrongUsageHandler(arg2));
-                            }
-                            break;
-                        }
-
-                        // -p
-                        case(kPaddingShort): {
-                            config->x_padding = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
-                            char* arg2 = NextArg(argc, argv, i + 1);
-                            if (arg2 == nullptr) {
-                                config->y_padding = config->x_padding;
-                            }else {
-                                config->y_padding = ToInt(WrongUsageHandler(arg2));
-                            }
-                            
-                            break;
-                        }
-
-                        // -c
-                        case(kCornerShort):
-                            config->corner = ParseCorner(WrongUsageHandler(NextArg(argc, argv, i)));
-                            break;
-
-                        case(kTileShort): {
-                            config->x_tile = ToInt(WrongUsageHandler(NextArg(argc, argv, i)));
-                            char* arg2 = NextArg(argc, argv, i + 1);
-                            if (arg2 == nullptr) {
-                                config->y_tile = config->x_tile;
-                            }else {
-                                config->y_tile = ToInt(WrongUsageHandler(arg2));
-                            }
-                            break;
-                        }
-
-                        // Unknown flag exeption
-                        default:
-                            Raise(kUnknownFlagError);
-                            break;
-                    }
-
-                    j ++;
-
-                }
+                ParseShortFlag(argc, argv, config, i);
             }
         }
     }
 
     // Validity check
-    
-    if (config->input_path == NULL){
-        Raise(kWrongArgumentError);
-    }
-    if (config->output_path == NULL){
-        Raise(kWrongArgumentError);
-    }
-    if (config->watermark_path == NULL){
-        Raise(kWrongArgumentError);
-    }
-    if (config->width == 0){
-        Raise(kWrongSizeError);
-    }
-    if (config->height == 0){
-        Raise(kWrongSizeError);
-    }
-    if (config->x_tile == 0){
-        Raise(kWrongArgumentError);
-    }
-    if (config->y_tile == 0){
-        Raise(kWrongArgumentError);
-    }
+    Validation(config);
 }
-
