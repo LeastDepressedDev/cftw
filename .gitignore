@@ -1,2 +1,5 @@
+target
 decktest*
 .vscode
+build
+*.a
