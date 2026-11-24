@@ -47,7 +47,7 @@ Test("RandomGibberishFlag2").cmd_line(["-a-b-a"]).expect_error(255, ERROR_UNKNOW
 Test("EmptyShortFlag").cmd_line(["-", "something"]).expect_error(252, ERROR_EMPTY_FLAG).wrap_up(ErrorHandling)
 Test("EmptyLongFlag").cmd_line(["--", "something"]).expect_error(252, ERROR_EMPTY_FLAG).wrap_up(ErrorHandling)
 
-print("\n")
+
 
 CorrectArgumentsSection = TestSection("CorrectArgsSection", full_test_name=True, log_completed=True)
 
@@ -61,26 +61,26 @@ Test("MixedCall2").cmd_line(["-o", "out/arg_checks/MixedCall_2.bmp", "--watermar
 Test("ShortlessCall1").cmd_line(["-io", "img1.bmp", "out/arg_checks/ShortlessCall_1.bmp", "--watermark", "wm1.bmp"]).expect("").wrap_up(CorrectArgumentsSection)
 Test("ShortlessCall1").cmd_line(["-iwo", "img1.bmp", "wm1.bmp", "out/arg_checks/ShortlessCall_1.bmp"]).expect("").wrap_up(CorrectArgumentsSection)
 
-print("\n")
+
 
 GenerativeSection = TestSection("GenerativeSection", full_test_name=True, log_completed=True)
 
 Test("BasicCase").cmd_line(["-iow", "img1.bmp", "out/generative_checks/BasicCase.bmp", "wm1.bmp", "-s", "100"]).expect("").wrap_up(GenerativeSection)
 Test("AdvancedCase").cmd_line(["-iow", "img1.bmp", "out/generative_checks/AdvancedCase.bmp", "wm2.bmp", "-s", "100", "50", "-p", "250", "15"]).expect("").wrap_up(GenerativeSection)
-Test("AdvancedCaseShort").cmd_line(["-iow", "img1.bmp", "out/generative_checks/AdvancedCaseShort.bmp", "wm3.bmp", "-c", "right-bottom", "--padding", "-400", "-50"])\
+Test("AdvancedCaseShort").cmd_line(["-iow", "img1.bmp", "out/generative_checks/AdvancedCaseShort.bmp", "wm3.bmp", "-c", "right-bottom", "--padding", "400", "50"])\
     .expect("").wrap_up(GenerativeSection)
 
-Test("TilingTest1").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest1.bmp", "wm1.bmp", "-t", "100"]).expect("").wrap_up(GenerativeSection)
-Test("TilingTest2").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest2.bmp", "wm2.bmp", "--tiling", "100", "30"]).expect("").wrap_up(GenerativeSection)
-Test("TilingTest3").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest3.bmp", "wm3.bmp", "--corner", "left-bottom", "-t", "200", "-p", "50", "--size", "400"]).expect("").wrap_up(GenerativeSection)
+Test("TilingTest1").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest1.bmp", "wm1.bmp", "-t", "10"]).expect("").wrap_up(GenerativeSection)
+Test("TilingTest2").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest2.bmp", "wm2.bmp", "--tiling", "10", "30"]).expect("").wrap_up(GenerativeSection)
+Test("TilingTest3").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest3.bmp", "wm3.bmp", "--corner", "left-bottom", "-t", "10", "-p", "50", "--size", "400"]).expect("").wrap_up(GenerativeSection)
 
-print("\n")
+
 
 EdgeCases = TestSection("EdgeCases", full_test_name=True, log_completed=True)
 
 Test("SelfImage").cmd_line(["-iow", "img1.bmp", "out/edge_cases/SelfImage.bmp", "img1.bmp"]).expect("").wrap_up(EdgeCases)
 Test("TwoBigImages").cmd_line(["-iow", "img1.bmp", "out/edge_cases/TwoBigImages.bmp", "img2.bmp"]).expect("").wrap_up(EdgeCases)
-Test("TiledSelfImage").cmd_line(["-iow", "img1.bmp", "out/edge_cases/TiledSelfImage.bmp", "img1.bmp", "-t", "100", "--size", "100"]).expect("").wrap_up(EdgeCases)
+Test("TiledSelfImage").cmd_line(["-iow", "img1.bmp", "out/edge_cases/TiledSelfImage.bmp", "img1.bmp", "-t", "20", "--size", "100"]).expect("").wrap_up(EdgeCases)
 Test("BiiiiiiiiiiigImage").cmd_line(["-iow", "img1.bmp", "out/edge_cases/BiiiiiiiiiiigImage.bmp", "img2.bmp", "--size", "10000000"]).expect("").wrap_up(EdgeCases)
 
 Test("ToooBig").cmd_line(["-iow", "img1.bmp", "out/edge_cases/__TooBig.bmp", "-t", "10", "-s", "20000000000000000000000000000000000000000000"]).expect_error(253, ERROR_ARG_MISMATCH).wrap_up(EdgeCases)
@@ -88,4 +88,9 @@ Test("NegativeNumbers").cmd_line(["-iow", "img1.bmp", "out/edge_cases/__Negative
 
 
 
-exit(max([ErrorHandling.run(app), CorrectArgumentsSection.run(app), GenerativeSection.run(app), EdgeCases.run(app)]))
+exit(max([
+    [ErrorHandling.run(app), print("\n\n\n\n")][0], 
+    [CorrectArgumentsSection.run(app), print("\n\n\n\n")][0], 
+    [GenerativeSection.run(app), print("\n\n\n\n")][0], 
+    [EdgeCases.run(app), print("\n\n\n\n")][0]
+]))
