@@ -26,6 +26,10 @@ int BMPprocessor(Config *config) {
     unsigned long result_width = input_img.resultPtr->ulWidth;
     unsigned long result_height = input_img.resultPtr->ulHeight;
 
+
+    config->width = std::min(config->width, result_width);
+    config->height = std::min(config->height, result_height);
+
     if (config->width != -1 && config->height != -1) {
         result_width = config->width;
         result_height = config->height;
