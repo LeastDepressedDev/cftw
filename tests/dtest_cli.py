@@ -71,7 +71,7 @@ Test("AdvancedCaseShort").cmd_line(["-iow", "img1.bmp", "out/generative_checks/A
     .expect("").wrap_up(GenerativeSection)
 
 Test("TilingTest1").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest1.bmp", "wm1.bmp", "-t", "10"]).expect("").wrap_up(GenerativeSection)
-Test("TilingTest2").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest2.bmp", "wm2.bmp", "--tiling", "10", "30"]).expect("").wrap_up(GenerativeSection)
+Test("TilingTest2").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest2.bmp", "wm2.bmp", "--tile", "10", "30"]).expect("").wrap_up(GenerativeSection)
 Test("TilingTest3").cmd_line(["-iow", "img1.bmp", "out/generative_checks/TilingTest3.bmp", "wm3.bmp", "--corner", "left-bottom", "-t", "10", "-p", "50", "--size", "400"]).expect("").wrap_up(GenerativeSection)
 
 
