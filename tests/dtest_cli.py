@@ -83,8 +83,8 @@ Test("TwoBigImages").cmd_line(["-iow", "img1.bmp", "out/edge_cases/TwoBigImages.
 Test("TiledSelfImage").cmd_line(["-iow", "img1.bmp", "out/edge_cases/TiledSelfImage.bmp", "img1.bmp", "-t", "20", "--size", "100"]).expect("").wrap_up(EdgeCases)
 Test("BiiiiiiiiiiigImage").cmd_line(["-iow", "img1.bmp", "out/edge_cases/BiiiiiiiiiiigImage.bmp", "img2.bmp", "--size", "10000000"]).expect("").wrap_up(EdgeCases)
 
-Test("ToooBig").cmd_line(["-iow", "img1.bmp", "out/edge_cases/__TooBig.bmp", "-t", "10", "-s", "20000000000000000000000000000000000000000000"]).expect_error(253, ERROR_ARG_MISMATCH).wrap_up(EdgeCases)
-Test("NegativeNumbers").cmd_line(["-iow", "img1.bmp", "out/edge_cases/__NegativeNumbers.bmp", "-t", "-10", "-s", "20"]).expect_error(253, ERROR_ARG_MISMATCH).wrap_up(EdgeCases)
+Test("ToooBig").cmd_line(["-iow", "img1.bmp", "out/edge_cases/__TooBig.bmp", "wm2.bmp", "-t", "10", "-s", "20000000000000000000000000000000000000000000"]).expect_error(253, ERROR_ARG_MISMATCH).wrap_up(EdgeCases)
+Test("NegativeNumbers").cmd_line(["-iow", "img1.bmp", "out/edge_cases/__NegativeNumbers.bmp", "wm2.bmp", "-t", "-10", "-s", "20"]).expect_error(253, ERROR_ARG_MISMATCH).wrap_up(EdgeCases)
 
 
 
