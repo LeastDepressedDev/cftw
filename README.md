@@ -52,8 +52,17 @@ Optional flags:
 ```
 
 # Developers UNITE!!!
-Consider reading `fordev/README.md` before contributing...
-
+Consider reading `fordev/README.md` before contributing... \
+But honestly, we all know that dis one is a *one-day-go* project, so futher contribution will not ever be viewed by any member of the initial taem. If you **really** wanna continue the project - just fork it and do whatever you want. \
+\
+Just do not forget to shower. @LeastDepressedDev 2026 - *mic out* \
+\
+\
+\
+\
+\
+\
+...
 # Gotta stay young forever my de*e*r
 ```
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
