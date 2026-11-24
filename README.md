@@ -1,10 +1,60 @@
 # Cry For This Watermark
-CFTW is a solution that aims to provide user with a tool to apply watermark on `.bmp` images.
+CFTW is a solution that aims to provide user with a tool to apply watermark on `.bmp` images. We were not sure
+about what language should we pick, so we chose both: `c++` & `Rust`. Works with *most* of the bmp-headers. 
+
+# Installation 
+For those who value their time: just execute `build.sh`.
+For those who don't or need a fancy looking script:
+```bash
+cd cli &&
+cmake -B build && cmake --build build && cd ..
+
+cd libbmp && 
+cargo build --release && cd ..
+
+if [[ ! -d cli/include ]]; then
+    mkdir cli/include
+fi &&
+cp libbmp/headers/bmplib.h cli/include/bmplib.h &&
+cp libbmp/target/release/libbmp.a cli &&
+
+if [[ ! -d build ]]; then
+    mkdir build
+fi &&
+
+cp cli/build/cftw-cli ./build
+```
+
+Application is natively developed on `arch-linux` and compiled and test on `ubuntu`. It is not guaranteed to work on **anything** else, so test before using in prod.
+
+# Usage
+Result of `cftw-cli --help`
+```ts
+Usage:
+  cftw-cli [OPTIONS]
+
+Description:
+  CLI tool for watermarking BMP images.
+
+Required flags:
+ -i, --input <path>                                Path to the source BMP image
+ -w, --watermark <path>                            Path to the BMP watermark
+ -o, --output <path>                               Path to the output BMP image
+
+Optional flags:
+ -s, --size <width> [<height>]                     Set dimensions. If height is omitted, defaults to width (square).
+ -p, --padding <x-padding> [<y-padding>]           Set padding. If y-padding is omitted, defaults to x-padding.
+ -c, --corner <position>                           Set corner position.
+                                                   Valid values: left-top, left-bottom, right-top, right-bottom.
+ -t, --tile <x> [<y>]                              Tile pattern <x> times horizontally and <y> times vertically.
+                                                   If y in omitted, defaults to x.
+ -h, --help                                        Display detailed description of configuration parameters and exit
+```
 
 # Developers UNITE!!!
 Consider reading `fordev/README.md` before contributing...
 
-# Further Description will be provided later
+# Gotta stay young forever my de*e*r
 ```
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                                                                                                                         
