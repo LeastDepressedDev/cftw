@@ -43,6 +43,7 @@ jobs:
           mkdir ${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }} &&
           cp -v cli/build/cftw-cli ./${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }} &&
           cp -v tests/dtest_* ./${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }} &&
+          cp -v tests/*.bmp ./${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }} &&
           cd ${{ env.ARTIFACT_FOLDER }}_v${{ env.VERSION }} &&
           git clone https://github.com/LeastDepressedDev/decktests.git &&
           mv -v decktests repo_decktests &&
@@ -97,3 +98,4 @@ jobs:
           name: cftw
           path: |
             ${{env.ARTIFACT_FOLDER}}_v${{env.VERSION}}/cftw-cli
+            ${{env.ARTIFACT_FOLDER}}_v${{env.VERSION}}/out
